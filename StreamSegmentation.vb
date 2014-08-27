@@ -1,6 +1,6 @@
 '*******************************************************************
 'DETERMINAÇÃO DO STREAM SEGMENTATION
-'Criado por Vinícius Alencar Siqueira - 20/01/2014
+'Criado por Vinícius Alencar Siqueira - 20/01/2014 jiuihuhh
 '*******************************************************************
 Imports IPHDataManagement
 
