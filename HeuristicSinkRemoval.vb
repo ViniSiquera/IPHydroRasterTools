@@ -2,6 +2,7 @@
 'REMOÇÃO DE DEPRESSÕES
 'Criado por Vinícius Alencar Siqueira - 20/01/2014
 'CÓDIGO MHS (Modified Heuristic Search) - v1.4
+'Baseado no Artigo de Hou et al (2011) - Automatic Extraction of Drainage Networks from DEMs Base on Heuristic Search. Journal of Software, Vol. 6, nº 8
 '*******************************************************************
 Imports IPHDataManagement
 
@@ -16,6 +17,10 @@ Public Class HeuristicSinkRemoval
     Private _tamanhoJanela As Integer = 5 'Tamanho da janela é a dimensão para N x N do método orinal de Hou et al (2011); 
     Private _MaxOpenList, _MaxClosedList As Integer
     Private _WeightFuncG As Single 'Peso da função de custo 
+
+    'Matriz de direções para atribuir a direção de fluxo em área plana: esquerda, baixo, direita, cima, diagonais
+    Private _directionsX() As Short = {-1, 0, 1, 0, -1, -1, 1, 1} 'Matriz de direções em X
+    Private _directionsY() As Short = {0, -1, 0, 1, 1, -1, -1, 1} 'Matriz de direções em Y
 
     Private _OpenList() As HeuristicCell 'Conjunto das células candidatas
     Private _ClosedList() As HeuristicCell 'Conjunto das células selecionadas
@@ -671,14 +676,12 @@ endMovingCells:
         Dim elevation As Int16 = _MDE.Dados(Yc, Xc)
         Dim yi, xi As Int16
 
-        For j = -1 To 1
-            yi = Yc + j
-            For i = -1 To 1
-                xi = Xc + i
+         For index = 0 To 7 'Para os elementos da matriz de direções
+        
+            yi = Yc + _directionsY(index)
+            xi = Xc + _directionsX(index)
 
-                If i <> 0 OrElse j <> 0 Then 'Exclui a célula central
-
-                    If _MDE.Dados(yi, xi) = elevation Then 'Somente se a célula possui cota igual àquela sendo analisada
+                     If _MDE.Dados(yi, xi) = elevation Then 'Somente se a célula possui cota igual àquela sendo analisada
                         If _FlowDirection.Dados(yi, xi) = 0 Then Validated = True
 
                         If Validated = True Then 'caso tenha sido encontrado algum vizinho com direção de fluxo atribuída, manda água pra ele
@@ -687,9 +690,7 @@ endMovingCells:
                         End If
 
                     End If
-                End If
-            Next
-        Next
+          Next
 endVerify:
 
     End Sub
