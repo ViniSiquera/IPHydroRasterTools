@@ -86,6 +86,34 @@ Public Class Catchments
         InsertOutlets() 'Insere os exutórios na matriz de dados
 
     End Sub
+    
+    ''' <summary>
+    ''' Atribui os exutóros na matriz para Ferramenta "Depth-Area-Volume"
+    ''' </summary>
+    ''' <param name="ShapeFileOutlets">Descrição: O arquivo em formato shapefile com os exutorios</param>
+    Public Sub Special_SetPointOutlets(ByVal ShapeFileOutlets As String, ByVal index As Integer)
+
+        'Especial para Ferramenta "Depth-Area-Volume", analisando os vários pontos de um shapefile um de cada vez
+
+        Dim sf As New MapWinGIS.Shapefile 'Shapefile com os exutórios
+        Dim sh As New MapWinGIS.Shape
+
+        sf.Open(ShapeFileOutlets) 'Abre o arquivo shapefile dos exutórios
+        'Dim nCellExutorios As Integer = sf.NumShapes 'atribui o número de exutórios
+        Dim nCellExutorios As Integer = 1 'atribui o número de exutórios
+
+        ReDim _CellExutorios(nCellExutorios - 1) 'Redimensiona a variavel que armazena os exutórios
+
+        'For i = 0 To nCellExutorios - 1
+        'Now get the current shape at position i (polygon or polyline) 
+        sh = sf.Shape(index)
+        '_CellExutorios(i) = New CellWatershed(sh.Point(0).y, sh.Point(0).x, _FlowDirection.Linhas, _FlowDirection.Colunas, _FlowDirection.Cellsize, _FlowDirection.XllCorner, _FlowDirection.YllCorner, i)
+        _CellExutorios(0) = New CellWatershed(sh.Point(0).y, sh.Point(0).x, _FlowDirection.Linhas, _FlowDirection.Colunas, _FlowDirection.Cellsize, _FlowDirection.XllCorner, _FlowDirection.YllCorner, index + 1)
+        'Next
+
+        InsertOutlets() 'Insere os exutórios na matriz de dados
+
+    End Sub
 
     ''' <summary>
     ''' Identifica as catchments
