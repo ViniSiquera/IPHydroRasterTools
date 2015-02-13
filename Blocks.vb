@@ -200,6 +200,8 @@ Public Class Blocks
         If _LandUseVeget.Linhas <> _SoilTypes.Linhas Then Throw New Exception("LU and ST number of raster lines doesn't match.")
         If _LandUseVeget.Colunas <> _SoilTypes.Colunas Then Throw New Exception("LU and ST number of raster columns doesn't match.")
         If _LandUseVeget.Cellsize <> _SoilTypes.Cellsize Then Throw New Exception("LU and ST number of raster cellsize doesn't match")
+        If _LandUseVeget.XllCorner <> _SoilTypes.XllCorner Then Throw New Exception("LU and ST xll coordinates do not match")
+        If _LandUseVeget.YllCorner <> _SoilTypes.YllCorner Then Throw New Exception("LU and ST yll coordinates do not match")
 
         _HRUraster = _SoilTypes.CopyData 'Copia os dados para o novo raster
 
