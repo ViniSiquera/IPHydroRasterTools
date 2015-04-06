@@ -1,6 +1,7 @@
 '*******************************************************************
 'DETERMINAÇÃO DE ÁREA ACUMULADA
 'Criado por Vinícius Alencar Siqueira - 20/01/2014
+'Cálculo do número de células acumuladas baseado em Haverkort e Janssen (2012) - Simple I/O efficient flow accumulation on grid terrains
 '*******************************************************************
 Imports IPHDataManagement
 
@@ -64,9 +65,9 @@ Public Class FlowAccumulation
 
                 If _CheckedNodeList(posY, posX) = False Then 'Se a célula ainda não foi checada
                     Do
-                        If NeighbourCellsAnalyzed(posY, posX) = True Then 'Verifica se todas as células vizinhas já foram analizadas; Caso sim:
+                        If NeighbourCellsAnalyzed(posY, posX) = True Then 'Verifica se todas as células vizinhas já foram analisadas; Caso sim:
                             totalCells = CLng(_FlowAcc.Dados(posY, posX)) 'Armazena o número de células acumuladas
-                            _CheckedNodeList(posY, posX) = True 'Indica que a célula foi analizada
+                            _CheckedNodeList(posY, posX) = True 'Indica que a célula foi analisada
                             FlowDirection.MoveToFlowDirection(_FlowDirection.Dados(posY, posX), posY, posX) 'Move na direção do flow direction
 
                             If posX < 0 OrElse posY < 0 OrElse posX > (_FlowDirection.Colunas - 1) OrElse posY > (_FlowDirection.Linhas - 1) Then Exit Do 'Se extrapolar os limites da matriz, sai do loop
