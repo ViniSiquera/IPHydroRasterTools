@@ -61,7 +61,7 @@ Public Class LengthSegmentation
         For row = 0 To _StrSeg.Linhas - 1
             For col = 0 To _StrSeg.Colunas - 1
                 i = row : yAnterior = row
-                j = col : xAnterior = row
+                j = col : xAnterior = col
 
                 If _FlowAcc.Dados(i, j) > maxAccum Then 'Identificação da célula com exutório
                     _yOutlet = i
