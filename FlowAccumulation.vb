@@ -89,9 +89,9 @@ Public Class FlowAccumulation
     Private Function NeighbourCellsAnalyzed(ByVal Yc As Int16, ByVal xc As Int16) As Boolean
 
         'na openlist:,         'direções de apontamento para a célula central
-        'For y = -1 To 1       135  180  225       
-        'posY = (Yc + y)       90    x   270       
-        'For x = -1 To 1       45   360  315       
+        'For y = -1 To 1       2    4    8       
+        'posY = (Yc + y)       1    x   16       
+        'For x = -1 To 1       128  64  32       
         'posX = (xc + x)
 
         Dim xi, yi As Int16
