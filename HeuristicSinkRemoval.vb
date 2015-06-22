@@ -1,7 +1,6 @@
 '*******************************************************************
 'REMOÇÃO DE DEPRESSÕES
-'Criado por Vinícius Alencar Siqueira - 20/01/2014
-'CÓDIGO MHS (Modified Heuristic Search) - v1.4
+'Criado por Vinícius Alencar Siqueira - 20/01/2014, 'CÓDIGO MHS (Modified Heuristic Search) - v1.4
 'Baseado no Artigo de Hou et al (2011) - Automatic Extraction of Drainage Networks from DEMs Base on Heuristic Search. Journal of Software, Vol. 6, nº 8
 '*******************************************************************
 Imports IPHDataManagement
@@ -18,7 +17,6 @@ Public Class HeuristicSinkRemoval
     Private _MaxOpenList, _MaxClosedList As Integer
     Private _WeightFuncG As Single 'Peso da função de custo 
 
-    'Matriz de direções para atribuir a direção de fluxo em área plana: esquerda, baixo, direita, cima, diagonais
     Private _directionsX() As Short = {-1, 0, 1, 0, -1, -1, 1, 1} 'Matriz de direções em X
     Private _directionsY() As Short = {0, -1, 0, 1, 1, -1, -1, 1} 'Matriz de direções em Y
 
@@ -160,8 +158,6 @@ Public Class HeuristicSinkRemoval
         Dim Xposition, Yposition As Integer
 
         For iArray = 0 To nDepressions - 1 'Faça para todas as depressões encontradas
-
-            percent = iArray / nDepressions 'Indica o percentual concluído
 
             OutletFound = False 'Torna falso o encontro da saída
             Xposition = _Array(iArray).x 'Identifica a posição X da depressão
@@ -618,7 +614,7 @@ endMovingCells:
         Next
 
     End Sub
-    
+
     ''' <summary>
     ''' Escreve os dados do MDE em formato ASC
     ''' </summary>
@@ -666,31 +662,33 @@ endMovingCells:
     'Verifica se algum vizinho de mesma cota, ou inferior já possui flow direction, atribuindo a mesma em caso verdadeiro
     Private Sub VerifyFlowDirAtBounds(ByVal Yc As Int16, ByVal Xc As Int16, ByRef Validated As Boolean)
 
-        'na openlist:,         'direções de apontamento para a célula central
-        'For y = -1 To 1       135  180  225
-        'posY = (Yc + y)       90    x   270
-        'For x = -1 To 1       45   360  315
-        'posX = (xc + x)
+        '       'direções de apontamento para a célula central
+        '       2  4  8 
+        '       1    x   16
+        '       128   64  32
+
+        'Matriz de direções, no caso de apontamento - (1, 64, 16, 4, 2, 128, 32, 8)
 
         Validated = False
         Dim elevation As Int16 = _MDE.Dados(Yc, Xc)
         Dim yi, xi As Int16
 
-         For index = 0 To 7 'Para os elementos da matriz de direções
-        
-            yi = Yc + _directionsY(index)
+        For index = 0 To 7 'Para os elementos da matriz de direções
+
             xi = Xc + _directionsX(index)
+            yi = Yc + _directionsY(index)
 
-                     If _MDE.Dados(yi, xi) = elevation Then 'Somente se a célula possui cota igual àquela sendo analisada
-                        If _FlowDirection.Dados(yi, xi) = 0 Then Validated = True
+            If _MDE.Dados(yi, xi) = elevation Then 'Somente se a célula possui cota igual àquela sendo analisada
+                If _FlowDirection.Dados(yi, xi) = 0 Then Validated = True
 
-                        If Validated = True Then 'caso tenha sido encontrado algum vizinho com direção de fluxo atribuída, manda água pra ele
-                            _FlowDirection.Dados(Yc, Xc) = RelativeIncipientFlowDirection(Yc, yi, Xc, xi)
-                            GoTo endVerify
-                        End If
+                If Validated = True Then 'caso tenha sido encontrado algum vizinho com direção de fluxo atribuída, manda água pra ele
+                    _FlowDirection.Dados(Yc, Xc) = RelativeIncipientFlowDirection(Yc, yi, Xc, xi)
+                    GoTo endVerify
+                End If
+            End If
 
-                    End If
-          Next
+        Next
+
 endVerify:
 
     End Sub
@@ -699,49 +697,49 @@ endVerify:
     Private Sub FlowDirectionAtBounds()
 
         'Define o Flow direction dos cantos
-        _FlowDirection.Dados(0, 0) = -9999
-        _FlowDirection.Dados(0, _MDE.Colunas - 1) = -9999
-        _FlowDirection.Dados(_MDE.Linhas - 1, 0) = -9999
-        _FlowDirection.Dados(_MDE.Linhas - 1, _MDE.Colunas - 1) = -9999
+        _FlowDirection.Dados(0, 0) = _MDE.NoDataValue
+        _FlowDirection.Dados(0, _MDE.Colunas - 1) = _MDE.NoDataValue
+        _FlowDirection.Dados(_MDE.Linhas - 1, 0) = _MDE.NoDataValue
+        _FlowDirection.Dados(_MDE.Linhas - 1, _MDE.Colunas - 1) = _MDE.NoDataValue
 
         'Atribui o flow direction para fora dos limites da grade
         For y = 1 To _MDE.Linhas - 2
-            _FlowDirection.Dados(y, 0) = -9999
+            _FlowDirection.Dados(y, 0) = _MDE.NoDataValue
         Next
 
         For y = 1 To _MDE.Linhas - 2
-            _FlowDirection.Dados(y, _MDE.Colunas - 1) = -9999
+            _FlowDirection.Dados(y, _MDE.Colunas - 1) = _MDE.NoDataValue
         Next
 
         For x = 1 To _MDE.Colunas - 2
-            _FlowDirection.Dados(0, x) = -9999
+            _FlowDirection.Dados(0, x) = _MDE.NoDataValue
         Next
 
         For x = 1 To _MDE.Colunas - 2
-            _FlowDirection.Dados(_MDE.Linhas - 1, x) = -9999
+            _FlowDirection.Dados(_MDE.Linhas - 1, x) = _MDE.NoDataValue
         Next
 
         'Define o Flow direction dos cantos
-        '_FlowDirection.Dados(0, 0) = 315
-        '_FlowDirection.Dados(0, _MDE.Colunas - 1) = 45
-        '_FlowDirection.Dados(_MDE.Linhas - 1, 0) = 225
-        '_FlowDirection.Dados(_MDE.Linhas - 1, _MDE.Colunas - 1) = 135
+        '_FlowDirection.Dados(0, 0) = 32
+        '_FlowDirection.Dados(0, _MDE.Colunas - 1) = 128
+        '_FlowDirection.Dados(_MDE.Linhas - 1, 0) = 8
+        '_FlowDirection.Dados(_MDE.Linhas - 1, _MDE.Colunas - 1) = 2
 
         'Atribui o flow direction para fora dos limites da grade
         'For y = 1 To _MDE.Linhas - 2
-        '   _FlowDirection.Dados(y, 0) = 270
+        '   _FlowDirection.Dados(y, 0) = 16
         'Next
 
         'For y = 1 To _MDE.Linhas - 2
-        '   _FlowDirection.Dados(y, _MDE.Colunas - 1) = 90
+        '   _FlowDirection.Dados(y, _MDE.Colunas - 1) = 1
         'Next
 
         'For x = 1 To _MDE.Colunas - 2
-        '   _FlowDirection.Dados(0, x) = 360
+        '   _FlowDirection.Dados(0, x) = 64
         'Next
 
         'For x = 1 To _MDE.Colunas - 2
-        '   _FlowDirection.Dados(_MDE.Linhas - 1, x) = 180
+        '   _FlowDirection.Dados(_MDE.Linhas - 1, x) = 4
         'Next
 
 
@@ -772,9 +770,9 @@ endVerify:
         _MatrizD8(6) = valor - _MDE.Dados(y + 1, x)
         _MatrizD8(7) = (valor - _MDE.Dados(y + 1, x + 1)) / Math.Sqrt(2)
 
-        '315	360	    45
-        '270	0	    90      'Configuração das direções de fluxo para o IDRISI Kilimanjaro
-        '225	180	    135
+        '32	64	    128
+        '16	0	    1      'Configuração das direções de fluxo para o IDRISI Kilimanjaro
+        '8	4	    2
 
         Dim max As Single = 0.01
         Dim enumMax As Int16 = -1 'Valor inicial que indica que não há direção de fluxo
@@ -786,21 +784,21 @@ endVerify:
 
         Select Case enumMax  'Identifica o sentido conforme o número do enumerador máximo
             Case 0
-                Return 315
+                Return 32
             Case 1
-                Return 360
+                Return 64
             Case 2
-                Return 45
+                Return 128
             Case 3
-                Return 270
+                Return 16
             Case 4
-                Return 90
+                Return 1
             Case 5
-                Return 225
+                Return 8
             Case 6
-                Return 180
+                Return 4
             Case 7
-                Return 135
+                Return 2
             Case Else
                 Return 0
         End Select
@@ -816,14 +814,14 @@ endVerify:
         Dim xRel As Int16 = x2 - x1
         Dim yRel As Int16 = y2 - y1
 
-        If xRel = 1 And yRel = -1 Then Return 45
-        If xRel = 1 And yRel = 0 Then Return 90
-        If xRel = 1 And yRel = 1 Then Return 135
-        If xRel = 0 And yRel = 1 Then Return 180
-        If xRel = -1 And yRel = 1 Then Return 225
-        If xRel = -1 And yRel = 0 Then Return 270
-        If xRel = -1 And yRel = -1 Then Return 315
-        If xRel = 0 And yRel = -1 Then Return 360
+        If xRel = 1 And yRel = -1 Then Return 128
+        If xRel = 1 And yRel = 0 Then Return 1
+        If xRel = 1 And yRel = 1 Then Return 2
+        If xRel = 0 And yRel = 1 Then Return 4
+        If xRel = -1 And yRel = 1 Then Return 8
+        If xRel = -1 And yRel = 0 Then Return 16
+        If xRel = -1 And yRel = -1 Then Return 32
+        If xRel = 0 And yRel = -1 Then Return 64
 
         'Caso encontre algum outro valor dispara um exception
         Throw New Exception("Problemas ao tentar identificar a direção de fluxo do trecho de rio modificado.")
@@ -833,31 +831,31 @@ endVerify:
     'Move a linha e a coluna de acordo com o número armazenado
     Private Sub MoveToFlowDirection(ByVal valor As Int16, ByRef Lin As Int16, ByRef col As Int16)
 
-        '315	360	    45
-        '270	0	    90      'Configuração das direções de fluxo para o IDRISI Kilimanjaro
-        '225	180	    135
+        '32	64	    128
+        '16	0	    1      'Configuração das direções de fluxo para o IDRISI Kilimanjaro
+        '8	4	    2
 
         Select Case valor 'Identifica o sentido conforme o numero 
 
-            Case 45
+            Case 128
                 Lin = Lin - 1
                 col = col + 1
-            Case 90
+            Case 1
                 col = col + 1
-            Case 135
+            Case 2
                 Lin = Lin + 1
                 col = col + 1
-            Case 180
+            Case 4
                 Lin = Lin + 1
-            Case 225
+            Case 8
                 Lin = Lin + 1
                 col = col - 1
-            Case 270
+            Case 16
                 col = col - 1
-            Case 315
+            Case 32
                 Lin = Lin - 1
                 col = col - 1
-            Case 360
+            Case 64
                 Lin = Lin - 1
             Case Else
                 'Não muda, pois encontrou uma borda/depressão
@@ -874,4 +872,3 @@ endVerify:
 #End Region
 
 End Class
-
